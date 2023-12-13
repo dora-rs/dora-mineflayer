@@ -1,4 +1,4 @@
-dora running on mineflayer!
+# dora running on mineflayer!
 
 After you install official Minecraft, you should have a Minecraft official launcher, open it, and follow the instructions here:
 1. Select the version you want to play and start the game.
