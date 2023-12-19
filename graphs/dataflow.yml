@@ -1,0 +1,13 @@
+nodes:
+  - id: bot
+    custom:
+      source: python
+      args: ../basic.py
+      outputs:
+        - chat
+  - id: plot
+    custom:
+      source: python
+      args: ../plot.py
+      inputs:
+        chat: bot/chat
