@@ -3,11 +3,13 @@ nodes:
     custom:
       source: python
       args: ../basic.py
+      inputs:
+        tick: dora/timer/millis/50000
       outputs:
-        - chat
+        - image
   - id: plot
     custom:
       source: python
       args: ../plot.py
       inputs:
-        chat: bot/chat
+        chat: bot/image

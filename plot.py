@@ -9,9 +9,5 @@ for i in range(100):
     event = node.next()
     if event is not None:
         if event["type"] == "INPUT":
-            print(
-                f"""Node received:
-            id: {event["id"]},
-            value: {event["value"]},
-            metadata: {event["metadata"]}"""
-            )
+            if event["id"] == "image":
+                print("Got image", event["data"])
