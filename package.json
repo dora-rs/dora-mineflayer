@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "mineflayer": "^4.0.0",
+    "node-canvas-webgl": "github:PrismarineJS/node-canvas-webgl",
     "prismarine-viewer": "^1.26.2"
   }
 }
