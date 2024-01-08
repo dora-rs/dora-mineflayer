@@ -3,8 +3,15 @@ nodes:
     custom:
       source: python
       args: ../bot.py
+      outputs:
+        - stream
+  - id: web
+    custom:
+      source: python
+      args: ../web.py
       inputs:
-        tick: dora/timer/millis/500
+        stream: bot/stream
+        tick: dora/timer/millis/100
       outputs:
         - image
   - id: plot
@@ -12,4 +19,4 @@ nodes:
       source: python
       args: ../plot.py
       inputs:
-        image: bot/image
+        image: web/image
