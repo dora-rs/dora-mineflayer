@@ -7,7 +7,7 @@ viewer = require('prismarine-viewer').mineflayer
 
 RANGE_GOAL = 1
 BOT_USERNAME = 'bot'
-PORT = 62269
+PORT = 54176
 node = Node()
 
 bot = mineflayer.createBot({
