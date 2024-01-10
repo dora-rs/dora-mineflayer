@@ -1,56 +1,45 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from typing import Callable, Optional, Union
-
+import cv2
 import numpy as np
+from ultralytics import YOLO
+
+from dora import Node
 import pyarrow as pa
-import torch
-
-from dora import DoraStatus
-
-pa.array([])
 
 CAMERA_WIDTH = 960
-CAMERA_HEIGHT = 540
+CAMERA_HEIGHT = 454
 
+model = YOLO("yolov8n.pt")
 
-class Operator:
-    """
-    Infering object from images
-    """
+node = Node()
 
-    def __init__(self):
-        self.model = torch.hub.load("ultralytics/yolov5", "yolov5n")
+for event in node:
+    event_type = event["type"]
+    if event_type == "INPUT":
+        event_id = event["id"]
+        if event_id == "image":
+            print("[object detection] received image input")
+            frame = (
+                    event["value"]
+                    .to_numpy()
+                    .reshape((CAMERA_HEIGHT, CAMERA_WIDTH, 3))
+                )
+            results = model(frame)  # includes NMS
+            # Process results
+            boxes = np.array(results[0].boxes.xyxy.cpu())
+            conf = np.array(results[0].boxes.conf.cpu())
+            label = np.array(results[0].boxes.cls.cpu())
+            # concatenate them together
+            arrays = np.concatenate((boxes, conf[:, None], label[:, None]), axis=1)
 
-    def on_event(
-        self,
-        dora_event: dict,
-        send_output: Callable[[str, Union[bytes, pa.Array], Optional[dict]], None],
-    ) -> DoraStatus:
-        if dora_event["type"] == "INPUT":
-            return self.on_input(dora_event, send_output)
-        return DoraStatus.CONTINUE
-
-    def on_input(
-        self,
-        dora_input: dict,
-        send_output: Callable[[str, Union[bytes, pa.array], Optional[dict]], None],
-    ) -> DoraStatus:
-        """Handle image
-        Args:
-            dora_input (dict): Dict containing the "id", "value", and "metadata"
-            send_output Callable[[str, bytes | pa.Array, Optional[dict]], None]:
-                Function for sending output to the dataflow:
-                - First argument is the `output_id`
-                - Second argument is the data as either bytes or `pa.Array`
-                - Third argument is dora metadata dict
-                e.g.: `send_output("bbox", pa.array([100], type=pa.uint8()), dora_event["metadata"])`
-        """
-
-        frame = dora_input["value"].to_numpy().reshape((CAMERA_HEIGHT, CAMERA_WIDTH, 3))
-        frame = frame[:, :, ::-1]  # OpenCV image (BGR to RGB)
-        results = self.model(frame)  # includes NMS
-        arrays = pa.array(np.array(results.xyxy[0].cpu()).ravel())
-        send_output("bbox", arrays, dora_input["metadata"])
-        return DoraStatus.CONTINUE
+            node.send_output("bbox", pa.array(arrays.ravel()), event["metadata"])
+        else:
+            print("[object detection] ignoring unexpected input:", event_id)
+    elif event_type == "STOP":
+        print("[object detection] received stop")
+    elif event_type == "ERROR":
+        print("[object detection] error: ", event["error"])
+    else:
+        print("[object detection] received unexpected event:", event_type)

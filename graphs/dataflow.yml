@@ -19,4 +19,13 @@ nodes:
       source: python
       args: ../plot.py
       inputs:
+        bbox: object_detection/bbox
         image: web/image
+  - id: object_detection
+    custom:
+      source: python
+      args: ../object_detection.py
+      inputs:
+        image: web/image
+      outputs:
+        - bbox
