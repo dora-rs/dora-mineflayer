@@ -14,5 +14,5 @@ for event in node:
                 node.send_output("coordinates", pa.array([x, y, z])) 
             case "bot":
                 print("bot",flush=True)
-            case "turn":
+            case "aim":
                 node.send_output("shoot", pa.array([]))

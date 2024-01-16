@@ -8,7 +8,7 @@ viewer = require('prismarine-viewer').mineflayer
 
 RANGE_GOAL = 1
 BOT_USERNAME = 'bot'
-PORT = 53531
+PORT = 62409
 node = Node()
 
 bot = mineflayer.createBot({
@@ -21,17 +21,18 @@ bot.loadPlugin(pathfinder.pathfinder)
 
 @On(bot, 'spawn')
 def handle(*args):
+    is_item_activated = False
+    activation_time = time.time()
     viewer(bot, {'port': 3000, 'firstPerson': True})
     node.send_output('stream', pa.array([]))
     movements = pathfinder.Movements(bot)
     bow = bot.inventory.findInventoryItem('bow')
-    print(bow, flush=True)
-    arrow = bot.inventory.count('arrow')
+    arrow = bot.inventory.findInventoryItem('arrow')
     if not bow:
         bot.chat("/give @s minecraft:bow")
         bow = bot.inventory.findInventoryItem('bow')
     bot.equip(bow, 'hand')
-    if arrow < 32:
+    if not arrow:
         bot.chat("/give @s minecraft:arrow 64")
     
     for event in node:
@@ -42,10 +43,15 @@ def handle(*args):
                     bot.pathfinder.setMovements(movements)
                     bot.pathfinder.setGoal(pathfinder.goals.GoalNear(x, y, z, RANGE_GOAL))
                 case "shoot":
-                    bot.activateItem()
-                    time.sleep(2)
-                    bot.deactivateItem()
-                case "turn":
+                    if not is_item_activated:
+                        is_item_activated = True
+                        bot.activateItem()
+                        activation_time = time.time()
+                case "tick":
+                    if is_item_activated and time.time() - activation_time > 1.5:
+                        bot.deactivateItem()
+                        is_item_activated = False
+                case "aim":
                     [x, y] = event["value"].to_pylist()
                     x = bot.entity.yaw + x
                     bot.look(x, bot.entity.pitch, True)

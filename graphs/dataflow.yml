@@ -5,8 +5,8 @@ nodes:
       args: ../bot.py
       inputs:
         coordinates: control_op/coordinates
-        tick: dora/timer/millis/100
-        turn: plot/turn
+        tick: dora/timer/millis/1000
+        aim: plot/aim
         shoot: control_op/shoot
       outputs:
         - stream
@@ -30,7 +30,7 @@ nodes:
         bbox: object_detection/bbox
         image: web/image
       outputs:
-        - turn
+        - aim
   - id: object_detection
     custom:
       source: python
@@ -46,7 +46,7 @@ nodes:
       inputs:
         move: bot/move
         bot: bot/bot
-        turn: plot/turn
+        aim: plot/aim
       outputs:
         - coordinates
         - shoot

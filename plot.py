@@ -97,9 +97,7 @@ for event in node:
         if len(persons) > 0:
             move = calculate_center_movement(CAMERA_WIDTH, CAMERA_HEIGHT, persons)
             turn = calculate_turn_angles(CAMERA_WIDTH, CAMERA_HEIGHT, 70, move)
-            #print("move :", move, flush=True)
-            #print("turn :", turn, flush=True)
-            node.send_output("turn", pa.array(turn))
+            node.send_output("aim", pa.array(turn))
             persons = []
         
         cv2.imshow("frame", cv2_image)
