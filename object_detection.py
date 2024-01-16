@@ -26,14 +26,11 @@ for event in node:
                     .to_numpy()
                     .reshape((CAMERA_HEIGHT, CAMERA_WIDTH, 3))
                 )
-            results = model(frame)  # includes NMS
-            # Process results
+            results = model(frame)
             boxes = np.array(results[0].boxes.xyxy.cpu())
             conf = np.array(results[0].boxes.conf.cpu())
             label = np.array(results[0].boxes.cls.cpu())
-            # concatenate them together
             arrays = np.concatenate((boxes, conf[:, None], label[:, None]), axis=1)
-
             node.send_output("bbox", pa.array(arrays.ravel()), event["metadata"])
         else:
             print("[object detection] ignoring unexpected input:", event_id)

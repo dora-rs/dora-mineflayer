@@ -3,8 +3,15 @@ nodes:
     custom:
       source: python
       args: ../bot.py
+      inputs:
+        coordinates: control_op/coordinates
+        tick: dora/timer/millis/100
+        turn: plot/turn
+        shoot: control_op/shoot
       outputs:
         - stream
+        - move
+        - bot
   - id: web
     custom:
       source: python
@@ -14,6 +21,7 @@ nodes:
         tick: dora/timer/millis/100
       outputs:
         - image
+        - move
   - id: plot
     custom:
       source: python
@@ -21,6 +29,8 @@ nodes:
       inputs:
         bbox: object_detection/bbox
         image: web/image
+      outputs:
+        - turn
   - id: object_detection
     custom:
       source: python
@@ -29,3 +39,14 @@ nodes:
         image: web/image
       outputs:
         - bbox
+  - id: control_op
+    custom:
+      source: python
+      args: ../control_op.py
+      inputs:
+        move: bot/move
+        bot: bot/bot
+        turn: plot/turn
+      outputs:
+        - coordinates
+        - shoot
