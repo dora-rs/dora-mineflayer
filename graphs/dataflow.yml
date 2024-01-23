@@ -2,12 +2,14 @@ nodes:
   - id: bot
     custom:
       source: python
-      args: ../bot.py
+      args: ../operators/bot.py
       inputs:
-        coordinates: control_op/coordinates
         tick: dora/timer/millis/1000
         aim: plot/aim
         shoot: control_op/shoot
+        dig: control_op/dig
+        jump: control_op/jump
+        drink: control_op/drink
       outputs:
         - stream
         - move
@@ -15,7 +17,7 @@ nodes:
   - id: web
     custom:
       source: python
-      args: ../web.py
+      args: ../operators/web.py
       inputs:
         stream: bot/stream
         tick: dora/timer/millis/100
@@ -23,30 +25,56 @@ nodes:
         - image
         - move
   - id: plot
-    custom:
-      source: python
-      args: ../plot.py
+    operator:
+      python: ../operators/plot.py
       inputs:
         bbox: object_detection/bbox
         image: web/image
       outputs:
         - aim
   - id: object_detection
-    custom:
-      source: python
-      args: ../object_detection.py
+    operator:
+      python: ../operators/object_detection.py
       inputs:
         image: web/image
       outputs:
         - bbox
   - id: control_op
-    custom:
-      source: python
-      args: ../control_op.py
+    operator:
+      python: ../operators/control_op.py
       inputs:
-        move: bot/move
-        bot: bot/bot
         aim: plot/aim
+        text: whisper/text
       outputs:
-        - coordinates
         - shoot
+        - dig
+        - jump
+        - drink
+  - id: microphone
+    operator:
+      python: ../operators/microphone_op.py
+      inputs:
+        tick: dora/timer/secs/10
+      outputs:
+        - audio
+  - id: whisper
+    operator:
+      python: ../operators/whisper_op.py
+      inputs:
+        audio: microphone/audio
+      outputs:
+        - text
+  - id: chatgpt
+    operator:
+      python: ../operators/chatgpt_op.py
+      inputs:
+        raw_file: vectordb/raw_file
+      outputs:
+        - code
+  - id: vectordb
+    operator:
+      python: ../operators/sentence_transformers_op.py
+      inputs:
+        query: whisper/text
+      outputs:
+        - raw_file

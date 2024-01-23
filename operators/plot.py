@@ -4,16 +4,14 @@ import os
 import cv2
 import numpy as np
 import pyarrow as pa
-from dora import Node
+from dora import DoraStatus
+from typing import Callable, Optional, Union
 from utils import LABELS
 import math
 CAMERA_WIDTH = 960
 CAMERA_HEIGHT = 454
 
 CI = os.environ.get("CI")
-node = Node()
-bounding_box_messages = 0
-bboxs = []
 
 
 def calculate_center_movement(WIDTH, HEIGHT, boxes):
@@ -46,25 +44,52 @@ def calculate_turn_angles(width, height, fov, cow_offset):
 
     return horizontal_angle_rad, vertical_angle_rad
 
+class Operator:
+    """
+    Plot image and bounding box
+    """
 
-for event in node:
-    if event["type"] == "INPUT":
-        if event["id"] == "image":
-            cv2_image = (
-                event["value"]
+    def __init__(self):
+        self.image = []
+        self.bboxs = []
+        self.bounding_box_messages = 0
+        self.image_messages = 0
+    
+    def on_event(
+        self,
+        dora_event: dict,
+        send_output: Callable[[str, Union[bytes, pa.Array], Optional[dict]], None],
+    ) -> DoraStatus:
+        if dora_event["type"] == "INPUT":
+            return self.on_input(dora_event, send_output)
+        return DoraStatus.CONTINUE
+    
+    def on_input(
+        self,
+        dora_input: dict,
+        send_output: Callable[[str, Union[bytes, pa.Array], Optional[dict]], None],
+    ) -> DoraStatus:
+        if dora_input["id"] == "image":
+            frame = (
+                dora_input["value"]
                 .to_numpy()
                 .reshape((CAMERA_HEIGHT, CAMERA_WIDTH, 3))
                 .copy()  # copy the image because we want to modify it below
             )
-        if event["id"] == "bbox":
-            bboxs = event["value"].to_numpy()
-            bboxs = np.reshape(bboxs, (-1, 6))
+            self.image = frame
 
-            bounding_box_messages += 1
-            print("received " + str(bounding_box_messages) + " bounding boxes")
+            self.image_messages += 1
+            print("received " + str(self.image_messages) + " images")
+            
+        elif dora_input["id"] == "bbox" and len(self.image) != 0:
+            bboxs = dora_input["value"].to_numpy()
+            self.bboxs = np.reshape(bboxs, (-1, 6))
+
+            self.bounding_box_messages += 1
+            print("received " + str(self.bounding_box_messages) + " bounding boxes")
         
         persons = []
-        for bbox in bboxs:
+        for bbox in self.bboxs:
             [ 
                 min_x,
                 min_y,
@@ -78,14 +103,14 @@ for event in node:
                 persons.append([min_x, min_y, max_x, max_y])
                     
             cv2.rectangle(
-                cv2_image,
+                self.image,
                 (int(min_x), int(min_y)),
                 (int(max_x), int(max_y)),
                 (0, 255, 0),
                 2,
             )
             cv2.putText( 
-                cv2_image,
+                self.image,
                 LABELS[int(label)],
                 (int(max_x), int(max_y)),
                 cv2.FONT_HERSHEY_SIMPLEX,
@@ -97,11 +122,14 @@ for event in node:
         if len(persons) > 0:
             move = calculate_center_movement(CAMERA_WIDTH, CAMERA_HEIGHT, persons)
             turn = calculate_turn_angles(CAMERA_WIDTH, CAMERA_HEIGHT, 70, move)
-            node.send_output("aim", pa.array(turn))
+            send_output("aim", pa.array(turn))
             persons = []
         
-        cv2.imshow("frame", cv2_image)
-        if cv2.waitKey(1) & 0xFF == ord("q"):
-            cv2.destroyAllWindows()
-            exit()
+        if CI != "true":
+            cv2.imshow("frame", self.image)
+            if cv2.waitKey(1) & 0xFF == ord("q"):
+                return DoraStatus.STOP
+        return DoraStatus.CONTINUE
 
+    def __del__(self):
+        cv2.destroyAllWindows()

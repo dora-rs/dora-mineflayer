@@ -5,15 +5,16 @@ import time
 mineflayer = require('mineflayer')
 pathfinder = require('mineflayer-pathfinder')
 viewer = require('prismarine-viewer').mineflayer
+Vec3 = require('vec3')
 
 RANGE_GOAL = 1
 BOT_USERNAME = 'bot'
-PORT = 62409
+PORT = 58643
 node = Node()
 
 bot = mineflayer.createBot({
     'host': '127.0.0.1',
-    'port': PORT, 
+    'port': PORT,
     'username': BOT_USERNAME
 })
 
@@ -34,7 +35,7 @@ def handle(*args):
     bot.equip(bow, 'hand')
     if not arrow:
         bot.chat("/give @s minecraft:arrow 64")
-    
+
     for event in node:
         if event["type"] == "INPUT":
             match event["id"]:
@@ -55,7 +56,23 @@ def handle(*args):
                     [x, y] = event["value"].to_pylist()
                     x = bot.entity.yaw + x
                     bot.look(x, bot.entity.pitch, True)
+                case "dig":
+                    (x, y, z) = bot.entity.position
+                    target_block = bot.blockAt(Vec3(x, y-1, z))
+                    if target_block and bot.canDigBlock(target_block):
+                        bot.dig(target_block, on_finished=lambda err: print("Finished digging!", err))
+                case "jump":
+                    bot.setControlState('jump', True)
+                    time.sleep(0.1)
+                    bot.setControlState('jump', False)
+                case "drink":
+                    potion = bot.inventory.findInventoryItem('potion', 'inventory')
+                    if not potion:
+                        bot.chat("/give @s minecraft:potion{Potion:\"minecraft:strong_healing\"}")
+                        potion = bot.inventory.findInventoryItem('potion', 'inventory')
+                    if potion:
+                        bot.consume(potion, on_finished=lambda err: print("Finished drinking!", err))
+
 @On(bot, "end")
 def handle(*args):
     print("Bot ended!", args)
-
