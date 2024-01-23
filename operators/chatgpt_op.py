@@ -1,8 +1,5 @@
 from openai import OpenAI
 
-import os
-
-os.environ["OPENAI_API_KEY"] = "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" #a ne pas commit
 def ask_gpt(prompt, raw):
     client = OpenAI()
 
