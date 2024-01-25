@@ -9,12 +9,12 @@ import time
 import numpy as np
 import pyarrow as pa
 import sounddevice as sd
-
+from typing import Callable, Optional, Union
 from dora import DoraStatus
 
 # Set the parameters for recording
 SAMPLE_RATE = 16000
-MAX_DURATION = 7
+MAX_DURATION = 5
 
 
 class Operator:
@@ -27,10 +27,19 @@ class Operator:
 
     def on_event(
         self,
-        dora_event,
-        send_output,
+        dora_event: dict,
+        send_output: Callable[[str, Union[bytes, pa.Array], Optional[dict]], None],
     ) -> DoraStatus:
         if dora_event["type"] == "INPUT":
+            return self.on_input(dora_event, send_output)
+        return DoraStatus.CONTINUE
+    
+    def on_input(
+        self,
+        dora_input: dict,
+        send_output: Callable[[str, Union[bytes, pa.Array], Optional[dict]], None],
+    ) -> DoraStatus:
+        if dora_input["id"] == "mic_on":
             audio_data = sd.rec(
                 int(SAMPLE_RATE * MAX_DURATION),
                 samplerate=SAMPLE_RATE,
@@ -42,5 +51,5 @@ class Operator:
 
             audio_data = audio_data.ravel().astype(np.float32) / 32768.0
             if len(audio_data) > 0:
-                send_output("audio", pa.array(audio_data), dora_event["metadata"])
+                send_output("audio", pa.array(audio_data), dora_input["metadata"])
         return DoraStatus.CONTINUE

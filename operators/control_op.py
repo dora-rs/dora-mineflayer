@@ -3,7 +3,7 @@ from dora import DoraStatus
 from typing import Callable, Optional, Union
 import pyarrow as pa
 
-isshooting = False
+
 GOAL_OBJECTIVE = [250, 3, -100]
 
 
@@ -28,15 +28,16 @@ class Operator:
     ) -> DoraStatus:
         match dora_input["id"]:
             case "text":
-                text_input = dora_input["value"].to_pylist()[0].lower()  # Convert input text to lowercase
+                text_input = dora_input["value"].to_pylist()[0] # Convert input text to lowercase
                 if "dig" in text_input:
                     send_output("dig", pa.array([]))
                 elif "jump" in text_input:
                     send_output("jump", pa.array([]))
                 elif "drink" in text_input:
                     send_output("drink", pa.array([]))
+                elif "move" in text_input:
+                    send_output("move", pa.array(GOAL_OBJECTIVE))
                 
-                print(text_input, flush=True)  # Keep this print lowercase for consistency
             case "aim":
                 send_output("shoot", pa.array([]))
         

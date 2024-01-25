@@ -9,7 +9,7 @@ Vec3 = require('vec3')
 
 RANGE_GOAL = 1
 BOT_USERNAME = 'bot'
-PORT = 58643
+PORT = 56925
 node = Node()
 
 bot = mineflayer.createBot({
@@ -39,7 +39,7 @@ def handle(*args):
     for event in node:
         if event["type"] == "INPUT":
             match event["id"]:
-                case "coordinates":
+                case "move":
                     [x, y, z] = event["value"].to_pylist()
                     bot.pathfinder.setMovements(movements)
                     bot.pathfinder.setGoal(pathfinder.goals.GoalNear(x, y, z, RANGE_GOAL))

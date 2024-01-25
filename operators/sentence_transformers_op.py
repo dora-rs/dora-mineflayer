@@ -7,6 +7,7 @@ import sys
 import inspect
 import torch
 import pyarrow as pa
+from typing import Callable, Optional, Union
 
 SHOULD_NOT_BE_INCLUDED = [
     "utils.py",
@@ -16,7 +17,6 @@ SHOULD_NOT_BE_INCLUDED = [
     "microphone_op.py",
     "object_detection_op.py",
     "bot.py",
-    "plot.py",
     "web.py"
 ]
 
@@ -67,37 +67,45 @@ class Operator:
 
     def on_event(
         self,
-        dora_event,
-        send_output,
+        dora_event: dict,
+        send_output: Callable[[str, Union[bytes, pa.Array], Optional[dict]], None],
     ) -> DoraStatus:
         if dora_event["type"] == "INPUT":
-            if dora_event["id"] == "query":
-                values = dora_event["value"].to_pylist()
+            return self.on_input(dora_event, send_output)
+        return DoraStatus.CONTINUE
+    
+    def on_input(
+        self,
+        dora_input: dict,
+        send_output: Callable[[str, Union[bytes, pa.Array], Optional[dict]], None],
+    ) -> DoraStatus:
+        if dora_input["id"] == "query":
+            values = dora_input["value"].to_pylist()
 
-                # Only modify code if the word please is used.
-                if not ("please" in values[0] or "Please" in values[0]):
-                    print("Did not use please word")
-                    return DoraStatus.CONTINUE
+            # Only modify code if the word please is used.
+            if not ("please" in values[0] or "Please" in values[0]):
+                print("Did not use please word")
+                return DoraStatus.CONTINUE
 
-                query_embeddings = self.model.encode(values)
-                output = search(
-                    query_embeddings,
-                    self.encoding,
-                    self.path,
-                    self.raw,
-                )
-                [raw, path, score] = output[0:3]
-                print(
-                    (
-                        score,
-                        pa.array([{"raw": raw, "path": path, "query": values[0]}]),
-                    )
-                )
-                send_output(
-                    "raw_file",
+            query_embeddings = self.model.encode(values)
+            output = search(
+                query_embeddings,
+                self.encoding,
+                self.path,
+                self.raw,
+            )
+            [raw, path, score] = output[0:3]
+            print(
+                (
+                    score,
                     pa.array([{"raw": raw, "path": path, "query": values[0]}]),
-                    dora_event["metadata"],
                 )
+            )
+            send_output(
+                "raw_file",
+                pa.array([{"raw": raw, "path": path, "query": values[0]}]),
+                dora_input["metadata"],
+            )
 
         return DoraStatus.CONTINUE
 

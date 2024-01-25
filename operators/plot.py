@@ -119,6 +119,9 @@ class Operator:
                 2,
                 1,
             )
+            
+            
+            
         if len(persons) > 0:
             move = calculate_center_movement(CAMERA_WIDTH, CAMERA_HEIGHT, persons)
             turn = calculate_turn_angles(CAMERA_WIDTH, CAMERA_HEIGHT, 70, move)
@@ -127,6 +130,9 @@ class Operator:
         
         if CI != "true":
             cv2.imshow("frame", self.image)
+            if cv2.waitKey(1) == ord("q"):
+                send_output("mic", pa.array([]))
+            
             if cv2.waitKey(1) & 0xFF == ord("q"):
                 return DoraStatus.STOP
         return DoraStatus.CONTINUE

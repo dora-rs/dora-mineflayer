@@ -10,14 +10,13 @@ nodes:
         dig: control_op/dig
         jump: control_op/jump
         drink: control_op/drink
+        move: control_op/move
       outputs:
         - stream
-        - move
         - bot
   - id: web
-    custom:
-      source: python
-      args: ../operators/web.py
+    operator:
+      python: ../operators/web.py
       inputs:
         stream: bot/stream
         tick: dora/timer/millis/100
@@ -50,11 +49,12 @@ nodes:
         - dig
         - jump
         - drink
+        - move
   - id: microphone
     operator:
       python: ../operators/microphone_op.py
       inputs:
-        tick: dora/timer/secs/10
+        mic_on: mic_binding/mic_on
       outputs:
         - audio
   - id: whisper
@@ -64,6 +64,7 @@ nodes:
         audio: microphone/audio
       outputs:
         - text
+        - please
   - id: chatgpt
     operator:
       python: ../operators/chatgpt_op.py
@@ -75,6 +76,13 @@ nodes:
     operator:
       python: ../operators/sentence_transformers_op.py
       inputs:
-        query: whisper/text
+        query: whisper/please
       outputs:
         - raw_file
+  - id: mic_binding
+    operator:
+      python: ../operators/mic_binding.py
+      inputs:
+        tick: dora/timer/millis/50
+      outputs:
+        - mic_on
