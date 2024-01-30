@@ -25,6 +25,9 @@ openai-whisper
 sounddevice>=0.4.1
 OpenAi
 keyboard>=0.13.5
+sentence_transformers
+pynput
+
 # Logging -------------------------------------
 tensorboard>=2.4.1
 # wandb

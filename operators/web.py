@@ -6,6 +6,9 @@ import numpy as np
 import time
 import cv2
 
+CAMERA_WIDTH = 960
+CAMERA_HEIGHT = 540
+
 class Operator:
     
     def __init__(self):

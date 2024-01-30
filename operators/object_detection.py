@@ -8,7 +8,7 @@ from dora import DoraStatus
 import pyarrow as pa
 
 CAMERA_WIDTH = 960
-CAMERA_HEIGHT = 454
+CAMERA_HEIGHT = 455
 
 
 class Operator:

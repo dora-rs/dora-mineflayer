@@ -9,7 +9,7 @@ Vec3 = require('vec3')
 
 RANGE_GOAL = 1
 BOT_USERNAME = 'bot'
-PORT = 56925
+PORT = 57463
 node = Node()
 
 bot = mineflayer.createBot({
@@ -28,11 +28,15 @@ def handle(*args):
     node.send_output('stream', pa.array([]))
     movements = pathfinder.Movements(bot)
     bow = bot.inventory.findInventoryItem('bow')
-    arrow = bot.inventory.findInventoryItem('arrow')
+
     if not bow:
         bot.chat("/give @s minecraft:bow")
-        bow = bot.inventory.findInventoryItem('bow')
-    bot.equip(bow, 'hand')
+        bow2 = bot.inventory.findInventoryItem('bow')
+        bot.equip(bow2, 'hand')
+        
+    else:
+        bot.equip(bow, 'hand')
+    arrow = bot.inventory.findInventoryItem('arrow')
     if not arrow:
         bot.chat("/give @s minecraft:arrow 64")
 
@@ -61,10 +65,6 @@ def handle(*args):
                     target_block = bot.blockAt(Vec3(x, y-1, z))
                     if target_block and bot.canDigBlock(target_block):
                         bot.dig(target_block, on_finished=lambda err: print("Finished digging!", err))
-                case "jump":
-                    bot.setControlState('jump', True)
-                    time.sleep(0.1)
-                    bot.setControlState('jump', False)
                 case "drink":
                     potion = bot.inventory.findInventoryItem('potion', 'inventory')
                     if not potion:

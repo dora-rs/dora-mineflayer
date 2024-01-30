@@ -2,8 +2,10 @@
 
 ## Installation
 
-`pip install -r requirements.txt`
-[PyTorch](https://pytorch.org/get-started/locally/) need to be installed beforehand
+```bash
+pip install -r requirements.txt
+```
+[PyTorch](https://pytorch.org/get-started/locally/) and [FireFox](https://www.mozilla.org/en-US/firefox/new/) need to be installed beforehand
 
 ## Getting Started
 After you install official Minecraft, you should have a Minecraft official launcher, open it, and follow the instructions here:

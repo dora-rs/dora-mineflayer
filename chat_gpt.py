@@ -2,6 +2,7 @@ from openai import OpenAI #a ne pas commit
 
 def ask_gpt(commande, file):
   # Ouvrir le fichier en mode lecture ('r' pour read)
+  print("asking the AI", flush=True)
   with open(file, 'r') as fichier:
       # Lire tout le contenu du fichier dans une variable
       contenu = fichier.read()
@@ -49,13 +50,15 @@ def save_as(content, path):
     file.write(content)
   print("file saved !")
 
-#ask = ask_gpt("for the node bot add a new output position and a new input dig, for the node control_op add a new input position and a output dig", "graphs/dataflow.yml")
-#ask = ask_gpt("When I receive a input position, I want to be able to go the GOAL_OBJECTIVE, send output coordinate if the bot needs to move and if the y of GOAL_OBJECTIVE is lower than the y of the input, send output dig to dig the ground", "control_op.py")
-#ask = ask_gpt("when I get a text input, I want to read what's the text inside, if the text is dig then send a dig output, if it's jump send jump output, if it's drink send a drink output", "operators/control_op.py")
-#ask = ask_gpt("when I get a jump input, make the bot jump, when I get a drink input use minecraft command to give to the bot an health potion and drink it, when I get a dig input dig the ground under the feet of the bot", "operators/bot.py")
-ask = ask_gpt("I have some errors in the code, but I don't know where, so put some print inside to check for errors", "operators/microphone_op.py")
 
-save_as(extract_command(ask)[0], "operators/microphone_op.py")
+ask = ask_gpt("when I get jump in text input, I want to send a jump output", "operators/control_op.py")
+
+save_as(extract_command(ask)[0], "operators/control_op.py")
+
+ask2 = ask_gpt("when I get jump input, I want the bot the jump 2 times", "operators/bot.py")
+
+save_as(extract_command(ask2)[0], "operators/bot.py")
+
 
 """
 modifier bot pour activer une nouvelle fonctionnalité

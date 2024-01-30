@@ -80,9 +80,8 @@ nodes:
       outputs:
         - raw_file
   - id: mic_binding
-    operator:
-      python: ../operators/mic_binding.py
-      inputs:
-        tick: dora/timer/millis/50
+    custom:
+      source: python
+      args: ../operators/mic_binding.py
       outputs:
         - mic_on

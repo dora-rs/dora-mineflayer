@@ -51,7 +51,7 @@ class Operator:
             else:
                 send_output("text", pa.array([text]), dora_input["metadata"])
             #this will write the text to a file
-            #with open('readme.txt', 'w') as f:
-            #    f.write(text)
+            with open('readme.txt', 'w') as f:
+                f.write(text)
             
         return DoraStatus.CONTINUE

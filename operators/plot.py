@@ -9,7 +9,7 @@ from typing import Callable, Optional, Union
 from utils import LABELS
 import math
 CAMERA_WIDTH = 960
-CAMERA_HEIGHT = 454
+CAMERA_HEIGHT = 455
 
 CI = os.environ.get("CI")
 
