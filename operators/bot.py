@@ -13,9 +13,8 @@ PORT = 57463
 node = Node()
 
 bot = mineflayer.createBot({
-    'host': '127.0.0.1',
     'port': PORT,
-    'username': BOT_USERNAME
+    'username': BOT_USERNAME,
 })
 
 bot.loadPlugin(pathfinder.pathfinder)
@@ -60,19 +59,18 @@ def handle(*args):
                     [x, y] = event["value"].to_pylist()
                     x = bot.entity.yaw + x
                     bot.look(x, bot.entity.pitch, True)
-                case "dig":
-                    (x, y, z) = bot.entity.position
-                    target_block = bot.blockAt(Vec3(x, y-1, z))
-                    if target_block and bot.canDigBlock(target_block):
-                        bot.dig(target_block, on_finished=lambda err: print("Finished digging!", err))
                 case "drink":
-                    potion = bot.inventory.findInventoryItem('potion', 'inventory')
+                    potion = bot.inventory.findInventoryItem('potion')
                     if not potion:
-                        bot.chat("/give @s minecraft:potion{Potion:\"minecraft:strong_healing\"}")
-                        potion = bot.inventory.findInventoryItem('potion', 'inventory')
+                        bot.chat("/give @s minecraft:potion{Potion:\"minecraft:long_strength\"}")
+                        potion = bot.inventory.findInventoryItem('potion')
                     if potion:
-                        bot.consume(potion, on_finished=lambda err: print("Finished drinking!", err))
-
-@On(bot, "end")
-def handle(*args):
-    print("Bot ended!", args)
+                        bot.equip(potion, 'hand')
+                        bot.consume()
+                        bot.equip(bow, 'hand')
+                case "dig":
+                    x, y, z = bot.entity.position
+                    print(1, flush=True)
+                    targetBlock = bot.blockAt(Vec3(x, y - 1, z))
+                    if (bot.canDigBlock(targetBlock)) :
+                        bot.dig(targetBlock)

@@ -4,7 +4,7 @@ from typing import Callable, Optional, Union
 import pyarrow as pa
 
 
-GOAL_OBJECTIVE = [250, 3, -100]
+GOAL_OBJECTIVE = [-250, 3, 66]
 
 
 class Operator:

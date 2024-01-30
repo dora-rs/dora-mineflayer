@@ -14,7 +14,7 @@ from dora import DoraStatus
 
 # Set the parameters for recording
 SAMPLE_RATE = 16000
-MAX_DURATION = 5
+MAX_DURATION = 8
 
 
 class Operator:

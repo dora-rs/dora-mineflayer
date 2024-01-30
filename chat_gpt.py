@@ -51,11 +51,8 @@ def save_as(content, path):
   print("file saved !")
 
 
-ask = ask_gpt("when I get jump in text input, I want to send a jump output", "operators/control_op.py")
 
-save_as(extract_command(ask)[0], "operators/control_op.py")
-
-ask2 = ask_gpt("when I get jump input, I want the bot the jump 2 times", "operators/bot.py")
+ask2 = ask_gpt("when I get a place input, I want the bot to place a block in front of him, if he don't have any blocks give himself a stone block", "operators/bot.py")
 
 save_as(extract_command(ask2)[0], "operators/bot.py")
 

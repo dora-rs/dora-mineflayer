@@ -27,6 +27,7 @@ nodes:
     operator:
       python: ../operators/plot.py
       inputs:
+        text: whisper/text
         bbox: object_detection/bbox
         image: web/image
       outputs:

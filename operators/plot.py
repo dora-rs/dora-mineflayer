@@ -54,7 +54,7 @@ class Operator:
         self.bboxs = []
         self.bounding_box_messages = 0
         self.image_messages = 0
-    
+        self.text_whisper = ""
     def on_event(
         self,
         dora_event: dict,
@@ -87,7 +87,8 @@ class Operator:
 
             self.bounding_box_messages += 1
             print("received " + str(self.bounding_box_messages) + " bounding boxes")
-        
+        elif dora_input["id"] == "text" and len(self.image) != 0:
+            self.text_whisper = dora_input["value"][0].as_py()
         persons = []
         for bbox in self.bboxs:
             [ 
@@ -119,7 +120,10 @@ class Operator:
                 2,
                 1,
             )
-            
+
+        cv2.putText(
+            self.image, self.text_whisper, (20, 35), cv2.FONT_HERSHEY_SIMPLEX, 1, (250, 250, 250), 2, 1
+        )   
             
             
         if len(persons) > 0:

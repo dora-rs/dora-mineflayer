@@ -17,7 +17,8 @@ SHOULD_NOT_BE_INCLUDED = [
     "microphone_op.py",
     "object_detection_op.py",
     "bot.py",
-    "web.py"
+    "web.py",
+    "plot.py"
 ]
 
 
