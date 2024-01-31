@@ -14,7 +14,8 @@ from dora import DoraStatus
 
 # Set the parameters for recording
 SAMPLE_RATE = 16000
-MAX_DURATION = 8
+MAX_DURATION = 5
+MAX_DURATION_LONG = 12
 
 
 class Operator:
@@ -48,6 +49,20 @@ class Operator:
                 blocking=False,
             )
             time.sleep(MAX_DURATION)
+
+            audio_data = audio_data.ravel().astype(np.float32) / 32768.0
+            if len(audio_data) > 0:
+                send_output("audio", pa.array(audio_data), dora_input["metadata"])
+
+        elif dora_input["id"] == "mic_on_long":
+            audio_data = sd.rec(
+                int(SAMPLE_RATE * MAX_DURATION_LONG),
+                samplerate=SAMPLE_RATE,
+                channels=1,
+                dtype=np.int16,
+                blocking=False,
+            )
+            time.sleep(MAX_DURATION_LONG)
 
             audio_data = audio_data.ravel().astype(np.float32) / 32768.0
             if len(audio_data) > 0:

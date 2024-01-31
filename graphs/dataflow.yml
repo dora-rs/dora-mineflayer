@@ -8,7 +8,6 @@ nodes:
         aim: plot/aim
         shoot: control_op/shoot
         dig: control_op/dig
-        jump: control_op/jump
         drink: control_op/drink
         move: control_op/move
       outputs:
@@ -48,7 +47,6 @@ nodes:
       outputs:
         - shoot
         - dig
-        - jump
         - drink
         - move
   - id: microphone
@@ -86,3 +84,4 @@ nodes:
       args: ../operators/mic_binding.py
       outputs:
         - mic_on
+        - mic_on_long

@@ -9,7 +9,7 @@ Vec3 = require('vec3')
 
 RANGE_GOAL = 1
 BOT_USERNAME = 'bot'
-PORT = 57463
+PORT = 64371
 node = Node()
 
 bot = mineflayer.createBot({
@@ -30,11 +30,8 @@ def handle(*args):
 
     if not bow:
         bot.chat("/give @s minecraft:bow")
-        bow2 = bot.inventory.findInventoryItem('bow')
-        bot.equip(bow2, 'hand')
-        
-    else:
-        bot.equip(bow, 'hand')
+        bow = bot.inventory.findInventoryItem('bow')
+    bot.equip(bow, 'hand')
     arrow = bot.inventory.findInventoryItem('arrow')
     if not arrow:
         bot.chat("/give @s minecraft:arrow 64")
@@ -62,9 +59,9 @@ def handle(*args):
                 case "drink":
                     potion = bot.inventory.findInventoryItem('potion')
                     if not potion:
-                        bot.chat("/give @s minecraft:potion{Potion:\"minecraft:long_strength\"}")
+                        bot.chat("/give @s minecraft:potion{Potion:\"minecraft:strength\"}")
                         potion = bot.inventory.findInventoryItem('potion')
-                    if potion:
+
                         bot.equip(potion, 'hand')
                         bot.consume()
                         bot.equip(bow, 'hand')
